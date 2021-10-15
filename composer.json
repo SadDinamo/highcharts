@@ -2,23 +2,7 @@
     "name": "saddinamo/highcharts",
     "description": "Highcharts JS widget for Yii2.",
     "type": "yii2-extension",
-    "keywords": [
-        "yii",
-        "yii2",
-        "yii 2",
-        "extension",
-        "widget",
-        "chart",
-        "highcharts"
-    ],
-    "license": "BSD-3-Clause",
-    "authors": [
-        {
-            "name": "Saddinamo",
-            "email": "saddinamo@yandex.ru",
-            "role": "Developer"
-        }
-    ],
+    "license": "MIT",
     "require": {
         "yiisoft/yii2": "*"
     },
@@ -32,21 +16,10 @@
             "saddinamo\\highcharts\\": "src"
         }
     },
-    "extra": {
-        "branch-alias": {
-            "dev-master": "1.0-dev"
+    "repositories": [
+        {
+            "type": "composer",
+            "url": "https://asset-packagist.org"
         }
-    },
-    "config": {
-        "fxp-asset": {
-            "installer-paths": {
-                "bower-asset-library": "vendor/bower"
-            },
-            "vcs-driver-options": {
-                "github-no-api": true
-            },
-            "git-skip-update": "2 days",
-            "pattern-skip-version": "(-build|-patch)"
-        }
-    }
+    ]
 }

@@ -9,83 +9,81 @@ use yii\helpers\Json;
 /**
  * HighCharts widget renders a HighCharts JS chart
  *
- * @author SadDinamo <SadDinamo@gmail.com>
- * @package saddinamo\highcharts
  */
-class HighCharts1 extends Widget
+class HighCharts extends Widget
 {
-    /**
-     * @var array the HTML attributes for the links container tag.
-     * @see \yii\helpers\Html::renderTagAttributes() for details on how attributes are being rendered.
-     */
-    public $options = [];
-    /**
-     * @var array the options for the HighCharts plugin. Default options have exporting enabled.
-     * Please refer to the HighCharts plugin Web page for possible options.
-     * @see http://api.highcharts.com/highcharts
-     */
-    public $clientOptions = [];
+
+    public $ChartOptions = [];
+    public $HtmlOptions = [];
+
+    public $RenderMore;
+    public $Render3D;
+
+    public $Modules = [];
+
+    public $_renderTo;
 
     /**
      * @inheritdoc
      */
-    public function init()
-    {
+    public function init(){
         parent::init();
-        if (!isset($this->options['id'])) {
-            $this->options['id'] = $this->getId();
+        if (!isset($this->HtmlOptions['id'])) {
+            $this->HtmlOptions['id'] = $this->getId();
         }
-        $this->clientOptions = ArrayHelper::merge(
+
+        $this->ChartOptions = ArrayHelper::merge(
             [
                 'exporting' => [
                     'enabled' => true
                 ]
             ],
-            $this->clientOptions
+            $this->ChartOptions
         );
+
+        if (ArrayHelper::getValue($this->ChartOptions, 'exporting.enabled')) {
+            $this->Modules[] = 'exporting.js';
+        }
+
+        $this->_renderTo = ArrayHelper::getValue($this->ChartOptions, 'chart.renderTo');
     }
 
     /**
      * @inheritdoc
      */
-    public function run()
-    {
+    public function run(){
         if (empty($this->_renderTo)) {
-            echo Html::tag('div', '', $this->options);
-            $this->clientOptions['chart']['renderTo'] = $this->options['id'];
+            echo Html::tag('div', '', $this->HtmlOptions);
+            $this->ChartOptions['chart']['renderTo'] = $this->HtmlOptions['id'];
+            // var_dump($this->ChartOptions);
         }
-        // $this->registerClientScript();
+        $this->script_register();
     }
 
-    /**
-     * Registers the script for the plugin
-     */
-    // public function registerClientScript()
-    // {
-    //     $view = $this->getView();
+    private function script_register() {
+        $view = $this->getView();
+        $bundle = HighChartsAsset::register($view);
+        $id = str_replace('-', '_', $this->ChartOptions['id']);
 
-    //     $bundle = HighChartsAsset::register($view);
-    //     $id = str_replace('-', '_', $this->options['id']);
-    //     $options = $this->clientOptions;
+        if ($this->Render3D) {
+            $bundle->js[] = YII_DEBUG ? 'highcharts-3d.src.js' : 'highcharts-3d.js';
+        }
 
-    //     if ($this->enable3d) {
-    //         $bundle->js[] = YII_DEBUG ? 'highcharts-3d.src.js' : 'highcharts-3d.js';
-    //     }
+        if ($this->RenderMore) {
+            $bundle->js[] = YII_DEBUG ? 'highcharts-more.src.js' : 'highcharts-more.js';
+        }
 
-    //     if ($this->enableMore) {
-    //         $bundle->js[] = YII_DEBUG ? 'highcharts-more.src.js' : 'highcharts-more.js';
-    //     }
+        foreach ($this->Modules as $module) {
+            $bundle->js[] = "modules/{$module}";
+        }
 
-    //     foreach ($this->modules as $module) {
-    //         $bundle->js[] = "modules/{$module}";
-    //     }
+        if ($theme = ArrayHelper::getValue($this->ChartOptions, 'theme')) {
+            $bundle->js[] = "themes/{$theme}.js";
+        }
 
-    //     if ($theme = ArrayHelper::getValue($options, 'theme')) {
-    //         $bundle->js[] = "themes/{$theme}.js";
-    //     }
+        $options = Json::encode($this->ChartOptions);
+        // Var_dump($options);
 
-    //     $options = Json::encode($options);
-
-    //     $view->registerJs(";var highChart_{$id} = new Highcharts.Chart({$options});");
-    // }
+        $view->registerJs(";var highChart_{$id} = new Highcharts.Chart({$options});");
+    }
 }

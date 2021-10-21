@@ -55,7 +55,6 @@ class HighCharts extends Widget
         if (empty($this->_renderTo)) {
             echo Html::tag('div', '', $this->HtmlOptions);
             $this->ChartOptions['chart']['renderTo'] = $this->HtmlOptions['id'];
-            // var_dump($this->ChartOptions);
         }
         $this->script_register();
     }
@@ -63,7 +62,7 @@ class HighCharts extends Widget
     private function script_register() {
         $view = $this->getView();
         $bundle = HighChartsAsset::register($view);
-        $id = str_replace('-', '_', $this->ChartOptions['id']);
+        $id = str_replace('-', '_', $this->HtmlOptions['id']);
 
         if ($this->Render3D) {
             $bundle->js[] = YII_DEBUG ? 'highcharts-3d.src.js' : 'highcharts-3d.js';
